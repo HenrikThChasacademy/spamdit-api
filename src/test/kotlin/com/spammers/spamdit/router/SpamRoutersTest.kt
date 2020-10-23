@@ -2,6 +2,8 @@ package com.spammers.spamdit.router
 
 import com.spammers.spamdit.handler.SpamHandler
 import com.spammers.spamdit.model.Spam
+import com.spammers.spamdit.model.Topic
+import com.spammers.spamdit.model.User
 import com.spammers.spamdit.repository.SpamRepository
 import kotlinx.coroutines.FlowPreview
 import org.junit.Before
@@ -55,9 +57,12 @@ class SpamRoutersTest {
     @FlowPreview
     @Test
     fun `get all spam`() {
-        val spam1 = Spam("1", "super_user", "best topic", "the ultimate text", date)
-        val spam2 = Spam("2", "super_user", "another best topic", "the second ultimate text", date2)
-        val spam3 = Spam("3", "super_user", "last best topic", "the worst text", date3)
+        val spam1 = Spam("1", User("1","super_user", emptyList(), emptyList())
+                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
+        val spam2 = Spam("2", User("1","super_user", emptyList(), emptyList())
+                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
+        val spam3 = Spam("3", User("3","super_user", emptyList(), emptyList())
+                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
 
         val spamFlux = Flux.just(spam1, spam2, spam3)
         given(spamRepository.findAll()).willReturn(spamFlux)
@@ -74,7 +79,8 @@ class SpamRoutersTest {
     @FlowPreview
     @Test
     fun `get spam by id`() {
-        val spam = Spam("1", "super_user", "best topic", "the ultimate text", date)
+        val spam = Spam("1", User("1","super_user", emptyList(), emptyList())
+                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
         val spamMono = Mono.just(spam)
 
         given(spamRepository.findById("1")).willReturn(spamMono)

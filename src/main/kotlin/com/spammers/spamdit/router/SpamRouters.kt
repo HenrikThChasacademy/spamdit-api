@@ -15,6 +15,8 @@ class SpamRouters {
         GET("/spam", spamHandler::getSpam)
         GET("/spam/{id}", spamHandler::getSpamById)
         POST("/spam", spamHandler::saveSpam)
+        PUT("/spam/{id}", spamHandler::updateSpam)
+        DELETE("/car/{id}", spamHandler::deleteSpam)
     }
 
 }

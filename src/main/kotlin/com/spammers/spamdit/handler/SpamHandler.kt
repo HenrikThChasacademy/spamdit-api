@@ -19,7 +19,6 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
     suspend fun getSpam(request: ServerRequest): ServerResponse =
         ServerResponse.ok().json().bodyAndAwait(spamRepository.findAll().asFlow())
 
-
     suspend fun getSpamById(request: ServerRequest): ServerResponse {
         val spam: Deferred<Spam?> = GlobalScope.async {
             spamRepository.findById(request.pathVariable("id")).awaitFirstOrNull()
@@ -28,7 +27,6 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
         return spam.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?:
             ServerResponse.notFound().buildAndAwait()
     }
-
 
     suspend fun saveSpam(request: ServerRequest): ServerResponse {
         System.out.println(request)
@@ -39,4 +37,34 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
         return spam.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?:
             ServerResponse.notFound().buildAndAwait()
     }
+
+    suspend fun updateSpam(request: ServerRequest): ServerResponse {
+        System.out.println(request)
+
+        val spam: Deferred<Spam?> = GlobalScope.async {
+            spamRepository.findById(request.pathVariable("id")).awaitFirstOrNull()
+        }
+
+        return spam.await()?.let {
+            val savedSpam: Deferred<Spam?> = GlobalScope.async {
+                spamRepository.save(it).awaitFirstOrNull()
+            }
+            savedSpam.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) }
+        } ?: ServerResponse.notFound().buildAndAwait()
+    }
+
+    suspend fun deleteSpam(request: ServerRequest): ServerResponse {
+
+        val spam: Deferred<Spam?> = GlobalScope.async {
+            spamRepository.findById(request.pathVariable("id")).awaitFirstOrNull()
+        }
+        return spam.await()?.let {
+            val deletedSpam: Deferred<Void?> = GlobalScope.async {
+                spamRepository.delete(it).awaitFirstOrNull()
+            }
+            deletedSpam.await().let { ServerResponse.ok().buildAndAwait() }
+        } ?: ServerResponse.notFound().buildAndAwait()
+
+    }
+
 }
