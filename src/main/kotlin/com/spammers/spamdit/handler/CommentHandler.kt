@@ -13,7 +13,6 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
-import reactor.core.publisher.Mono
 
 @Component
 class CommentHandler (@Autowired val commentRepository: CommentRepository,
@@ -25,7 +24,7 @@ class CommentHandler (@Autowired val commentRepository: CommentRepository,
 
     suspend fun getCommentsForParent(request: ServerRequest): ServerResponse =
             ServerResponse.ok().json().bodyAndAwait(
-                    commentRepository.findAllByParentId(request.pathVariable("id")).asFlow())
+                    commentRepository.findAllByParentId(request.pathVariable("parentId")).asFlow())
 
     suspend fun saveComment(request: ServerRequest): ServerResponse {
         val comment: Comment = request.awaitBody()

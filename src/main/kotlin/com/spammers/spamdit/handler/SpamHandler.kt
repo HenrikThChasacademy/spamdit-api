@@ -2,6 +2,7 @@ package com.spammers.spamdit.handler
 
 import com.spammers.spamdit.model.Spam
 import com.spammers.spamdit.model.Topic
+import com.spammers.spamdit.repository.CommentRepository
 import com.spammers.spamdit.repository.SpamRepository
 import com.spammers.spamdit.repository.TopicRepository
 import kotlinx.coroutines.Deferred
@@ -15,8 +16,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 
 @Component
-class SpamHandler (@Autowired var spamRepository: SpamRepository,
-                   @Autowired var topicRepository: TopicRepository){
+class SpamHandler (@Autowired var spamRepository: SpamRepository){
 
     @FlowPreview
     suspend fun getSpam(request: ServerRequest): ServerResponse =
