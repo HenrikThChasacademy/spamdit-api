@@ -8,8 +8,9 @@ import java.time.LocalDateTime
 @Document
 data class Spam(
         @Id val id: String? = null,
-        val user: User,
-        @DBRef(lazy = true) val topic: Topic,
+        val userId: String,
+        var topicId: String,
         val text: String,
-        @DBRef(lazy = true) val comments: List<Comment>,
-        val date: LocalDateTime)
+        val commentIds: MutableList<String> = mutableListOf(),
+        val dateCreated: LocalDateTime,
+        val dateEdited: LocalDateTime? = null)

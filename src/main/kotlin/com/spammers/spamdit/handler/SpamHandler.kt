@@ -1,7 +1,9 @@
 package com.spammers.spamdit.handler
 
 import com.spammers.spamdit.model.Spam
+import com.spammers.spamdit.model.Topic
 import com.spammers.spamdit.repository.SpamRepository
+import com.spammers.spamdit.repository.TopicRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
@@ -13,7 +15,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 
 @Component
-class SpamHandler (@Autowired var spamRepository: SpamRepository){
+class SpamHandler (@Autowired var spamRepository: SpamRepository,
+                   @Autowired var topicRepository: TopicRepository){
 
     @FlowPreview
     suspend fun getSpam(request: ServerRequest): ServerResponse =
@@ -47,7 +50,7 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
 
         return spam.await()?.let {
             val savedSpam: Deferred<Spam?> = GlobalScope.async {
-                spamRepository.save(it).awaitFirstOrNull()
+                spamRepository.save(request.awaitBody<Spam>()).awaitFirstOrNull()
             }
             savedSpam.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) }
         } ?: ServerResponse.notFound().buildAndAwait()

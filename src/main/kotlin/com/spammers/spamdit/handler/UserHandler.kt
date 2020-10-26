@@ -1,6 +1,7 @@
 package com.spammers.spamdit.handler
 
 import com.spammers.spamdit.model.User
+import com.spammers.spamdit.repository.TopicRepository
 import com.spammers.spamdit.repository.UserRepository
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.FlowPreview
@@ -50,16 +51,18 @@ class UserHandler (@Autowired var userRepository: UserRepository){
     }
 
     suspend fun createUniqueUser(request: ServerRequest): ServerResponse {
+        lateinit var userInRequest: User
         val user: Deferred<User?> = GlobalScope.async {
-            userRepository.findFirstByName(request.awaitBody<User>().name).awaitFirstOrNull()
+            userInRequest = request.awaitBody();
+            userRepository.findFirstByName(userInRequest.name).awaitFirstOrNull()
         }
 
-        return user.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?: createUser(request)
+        return user.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?: createUser(userInRequest)
     }
 
-    private suspend fun createUser(request: ServerRequest): ServerResponse {
+    private suspend fun createUser(user: User): ServerResponse {
         val newUser: Deferred<User?> = GlobalScope.async {
-            userRepository.save(request.awaitBody<User>()).awaitFirstOrNull()
+            userRepository.save(user).awaitFirstOrNull()
         }
         return newUser.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) }
                 ?: ServerResponse.badRequest().buildAndAwait()

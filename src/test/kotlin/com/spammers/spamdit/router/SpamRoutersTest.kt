@@ -2,8 +2,6 @@ package com.spammers.spamdit.router
 
 import com.spammers.spamdit.handler.SpamHandler
 import com.spammers.spamdit.model.Spam
-import com.spammers.spamdit.model.Topic
-import com.spammers.spamdit.model.User
 import com.spammers.spamdit.repository.SpamRepository
 import kotlinx.coroutines.FlowPreview
 import org.junit.Before
@@ -20,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.test.web.reactive.server.expectBodyList
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDateTime
@@ -34,9 +31,6 @@ class SpamRoutersTest {
 
     @Autowired
     private lateinit var client: WebTestClient
-
-    @MockBean
-    private lateinit var webClient: WebClient
 
     @MockBean
     private lateinit var spamRepository: SpamRepository
@@ -57,12 +51,9 @@ class SpamRoutersTest {
     @FlowPreview
     @Test
     fun `get all spam`() {
-        val spam1 = Spam("1", User("1","super_user", emptyList(), emptyList())
-                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
-        val spam2 = Spam("2", User("1","super_user", emptyList(), emptyList())
-                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
-        val spam3 = Spam("3", User("3","super_user", emptyList(), emptyList())
-                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
+        val spam1 = Spam("1", "1","1", "the ultimate text", emptyList(), date)
+        val spam2 = Spam("2", "1", "1", "the ultimate text", emptyList(), date)
+        val spam3 = Spam("3", "3", "1", "the ultimate text", emptyList(), date)
 
         val spamFlux = Flux.just(spam1, spam2, spam3)
         given(spamRepository.findAll()).willReturn(spamFlux)
@@ -76,11 +67,9 @@ class SpamRoutersTest {
 
     }
 
-    @FlowPreview
     @Test
     fun `get spam by id`() {
-        val spam = Spam("1", User("1","super_user", emptyList(), emptyList())
-                , Topic("1", "best topic", emptyList()), "the ultimate text", emptyList(), date)
+        val spam = Spam("1", "1", "1", "the ultimate text", emptyList(), date)
         val spamMono = Mono.just(spam)
 
         given(spamRepository.findById("1")).willReturn(spamMono)
