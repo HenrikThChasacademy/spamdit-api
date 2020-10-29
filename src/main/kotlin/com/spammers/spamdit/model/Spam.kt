@@ -11,6 +11,6 @@ data class Spam(
         val userId: String,
         var topicId: String,
         val text: String,
-        val commentIds: MutableList<String> = mutableListOf(),
+        val commentIds: List<String> = listOf(),
         val dateCreated: LocalDateTime,
         val dateEdited: LocalDateTime? = null)

@@ -42,21 +42,33 @@ class CommentHandler (@Autowired val commentRepository: CommentRepository,
 
         return savedComment.await()?.let {commentWithId ->
             parentSpam.await()?.let {
-                it.commentIds.add(commentWithId.id!!)
+                val spamToSave = createUpdatedSpam(it, commentWithId.id)
                 println("Adding id to parent spam $it with id ${commentWithId.id}")
-                spamRepository.save(it).awaitFirstOrNull()
+                spamRepository.save(spamToSave).awaitFirstOrNull()
                 ServerResponse.ok().bodyValueAndAwait(commentWithId)
             } ?: updateParentCommentWithCommentId(commentWithId, parentComment)
         } ?: ServerResponse.notFound().buildAndAwait()
     }
 
+    fun createUpdatedSpam(spam: Spam, id: String?): Spam {
+        val commentIdList = spam.commentIds.toMutableList()
+        commentIdList.add(id!!)
+        return Spam(spam.id, spam.userId, spam.topicId, spam.text, commentIdList, spam.dateCreated, spam.dateEdited)
+    }
+
     suspend fun updateParentCommentWithCommentId(comment: Comment, parentComment: Deferred<Comment?>): ServerResponse {
         return parentComment.await()?.let {
-            it.commentIds.add(comment.id!!)
+            val commentToSave = createUpdatedComment(it, comment.id)
             println("Adding id to parent comment $it with id ${comment.id}")
-            commentRepository.save(it).awaitFirstOrNull()
-            ServerResponse.ok().bodyValueAndAwait(it)
+            commentRepository.save(commentToSave).awaitFirstOrNull()
+            ServerResponse.ok().bodyValueAndAwait(comment)
         } ?: ServerResponse.notFound().buildAndAwait()
+    }
+
+    fun createUpdatedComment(comment: Comment, id: String?): Comment {
+        val commentIdList = comment.commentIds.toMutableList()
+        commentIdList.add(id!!)
+        return Comment(comment.id, comment.parentId, comment.text, comment.userId, commentIdList, comment.dateCreated, comment.dateEdited)
     }
 
     suspend fun updateComment(request: ServerRequest): ServerResponse {

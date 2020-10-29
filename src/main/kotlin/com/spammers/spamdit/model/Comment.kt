@@ -11,6 +11,6 @@ data class Comment(@Id val id: String? = null,
                    @Indexed val parentId: String,
                    val text: String,
                    val userId: String,
-                   val commentIds: MutableList<String> = mutableListOf(),
+                   val commentIds: List<String> = listOf(),
                    val dateCreated: LocalDateTime,
                    val dateEdited: LocalDateTime? = null)
