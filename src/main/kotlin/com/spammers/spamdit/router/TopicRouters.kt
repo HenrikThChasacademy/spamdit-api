@@ -15,6 +15,6 @@ class TopicRouters {
         GET("/topic", topicHandler::getTopics)
         GET("/topic/{id}", topicHandler::getTopicById)
         GET("/topic/name/{name}", topicHandler::getTopicByText)
-        POST("/topic", topicHandler::saveTopic)
+        POST("/topic", topicHandler::createUniqueTopic)
     }
 }

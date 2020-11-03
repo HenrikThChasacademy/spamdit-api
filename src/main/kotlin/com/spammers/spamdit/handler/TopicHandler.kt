@@ -14,10 +14,19 @@ import org.springframework.web.reactive.function.server.*
 @Component
 class TopicHandler (@Autowired var topicRepository: TopicRepository) {
 
-    suspend fun saveTopic(request: ServerRequest): ServerResponse {
-        System.out.println(request)
+    suspend fun createUniqueTopic(request: ServerRequest): ServerResponse {
+        var topicInRequest = request.awaitBody<Topic>()
+        val topic: Deferred<Topic?> = GlobalScope.async{
+            topicRepository.findFirstByText(topicInRequest.text).awaitFirstOrNull()
+        }
+
+        return topic.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) }
+            ?: saveTopic(topicInRequest)
+    }
+
+    suspend fun saveTopic(topic: Topic): ServerResponse {
         val topic: Deferred<Topic?> = GlobalScope.async {
-            topicRepository.save(request.awaitBody<Topic>()).awaitFirstOrNull()
+            topicRepository.save(topic).awaitFirstOrNull()
         }
 
         return topic.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?:

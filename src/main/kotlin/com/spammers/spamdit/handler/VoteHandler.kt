@@ -15,10 +15,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
 import java.net.URI
+import java.time.LocalDateTime
 
 @Component
 class VoteHandler(@Autowired var voteRepository: VoteRepository,
@@ -35,18 +35,33 @@ class VoteHandler(@Autowired var voteRepository: VoteRepository,
             voteRepository.findById(request.pathVariable("id")).awaitFirstOrNull()
         }
 
-        return vote.await()?.let { ServerResponse.ok().bodyValueAndAwait(vote) } ?:
+        return vote.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?:
             ServerResponse.notFound().buildAndAwait()
 
     }
+
     suspend fun getVoteForSpamByUser(request: ServerRequest): ServerResponse {
+        val spamId = request.pathVariable("spamId")
+        val userId = request.pathVariable("userId")
         val vote: Deferred<Vote?> = GlobalScope.async {
-            voteRepository.findBySpamIdAndUserId(request.pathVariable("spamId"),
-                    request.pathVariable("userId")).awaitFirstOrNull()
+            voteRepository.findBySpamIdAndUserId(spamId, userId).awaitFirstOrNull()
         }
 
         return vote.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?:
-            ServerResponse.notFound().buildAndAwait()
+            ServerResponse.ok().bodyValueAndAwait(Vote(null, false, userId,
+                    spamId, null, LocalDateTime.now()))
+    }
+
+    suspend fun getVoteForCommentByUser(request: ServerRequest): ServerResponse {
+        val commentId = request.pathVariable("commentId")
+        val userId = request.pathVariable("userId")
+        val vote: Deferred<Vote?> = GlobalScope.async {
+            voteRepository.findByCommentIdAndUserId(commentId, userId).awaitFirstOrNull()
+        }
+
+        return vote.await()?.let { ServerResponse.ok().bodyValueAndAwait(it) } ?:
+        ServerResponse.ok().bodyValueAndAwait(Vote(null, false, userId,
+                null, commentId, LocalDateTime.now()))
     }
 
     suspend fun getAllVotesForComment(request: ServerRequest): ServerResponse =

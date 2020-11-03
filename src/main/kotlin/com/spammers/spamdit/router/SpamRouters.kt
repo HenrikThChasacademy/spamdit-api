@@ -14,6 +14,7 @@ class SpamRouters {
     fun spamRoutes(spamHandler: SpamHandler) = coRouter {
         GET("/spam", spamHandler::getSpam)
         GET("/spam/{id}", spamHandler::getSpamById)
+        GET("spam/topic/{topicId}", spamHandler::getSpamByTopic)
         POST("/spam", spamHandler::saveSpam)
         PUT("/spam/{id}", spamHandler::updateSpam)
         DELETE("/car/{id}", spamHandler::deleteSpam)

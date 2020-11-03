@@ -31,8 +31,12 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
             ServerResponse.notFound().buildAndAwait()
     }
 
+    suspend fun getSpamByTopic(request: ServerRequest): ServerResponse =
+            ServerResponse.ok().json().bodyAndAwait(
+                    spamRepository.findAllByTopicId(request.pathVariable("topicId")).asFlow())
+
     suspend fun saveSpam(request: ServerRequest): ServerResponse {
-        System.out.println(request)
+        println(request)
         val spam: Deferred<Spam?> = GlobalScope.async {
             spamRepository.save(request.awaitBody<Spam>()).awaitFirstOrNull()
         }
@@ -42,7 +46,7 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
     }
 
     suspend fun updateSpam(request: ServerRequest): ServerResponse {
-        System.out.println(request)
+        println(request)
 
         val spam: Deferred<Spam?> = GlobalScope.async {
             spamRepository.findById(request.pathVariable("id")).awaitFirstOrNull()

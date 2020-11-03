@@ -51,9 +51,8 @@ class UserHandler (@Autowired var userRepository: UserRepository){
     }
 
     suspend fun createUniqueUser(request: ServerRequest): ServerResponse {
-        lateinit var userInRequest: User
+        var userInRequest = request.awaitBody<User>()
         val user: Deferred<User?> = GlobalScope.async {
-            userInRequest = request.awaitBody();
             userRepository.findFirstByName(userInRequest.name).awaitFirstOrNull()
         }
 

@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 @Document
 data class Vote(@Id val id: String? = null,
-                val upVote: Boolean,
+                val isUpvote: Boolean,
                 val userId: String,
                 @Indexed val spamId: String? = null,
                 @Indexed val commentId: String? = null,
