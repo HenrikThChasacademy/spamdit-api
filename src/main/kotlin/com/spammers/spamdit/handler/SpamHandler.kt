@@ -35,6 +35,10 @@ class SpamHandler (@Autowired var spamRepository: SpamRepository){
             ServerResponse.ok().json().bodyAndAwait(
                     spamRepository.findAllByTopicId(request.pathVariable("topicId")).asFlow())
 
+    suspend fun getSpamByUser(request: ServerRequest): ServerResponse =
+            ServerResponse.ok().json().bodyAndAwait(
+                    spamRepository.findAllByUserId(request.pathVariable("userId")).asFlow())
+
     suspend fun saveSpam(request: ServerRequest): ServerResponse {
         println(request)
         val spam: Deferred<Spam?> = GlobalScope.async {

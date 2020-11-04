@@ -6,4 +6,5 @@ import reactor.core.publisher.Flux
 
 interface SpamRepository : ReactiveMongoRepository<Spam, String> {
     fun findAllByTopicId(topicId: String): Flux<Spam>
+    fun findAllByUserId(userId: String): Flux<Spam>
 }
