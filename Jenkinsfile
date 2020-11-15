@@ -16,18 +16,18 @@ pipeline {
         }
         stage('Dockerize'){
             steps {
-                sh "docker build -t 674186390846.dkr.ecr.eu-west-1.amazonaws.com/spam ."
+                sh "docker build -t 674186390846.dkr.ecr.eu-west-1.amazonaws.com/spamdit ."
             }
         }
         stage('Push image to ECR'){
             steps {
                 sh '$(aws ecr get-login --registry-ids 674186390846 --no-include-email --region eu-west-1)'
-                sh "docker push 674186390846.dkr.ecr.eu-west-1.amazonaws.com/spam"
+                sh "docker push 674186390846.dkr.ecr.eu-west-1.amazonaws.com/spamdit"
             }
         }
         stage('Update ECR service'){
             steps {
-                sh 'aws ecs update-service --cluster spam-cluster --service Spam-service --force-new-deployment --region eu-west-1'
+                sh 'aws ecs update-service --cluster spamdit-cluster --service Spamdit-service --force-new-deployment --region eu-west-1'
             }
         }
     }
